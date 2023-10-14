@@ -220,12 +220,11 @@ LEFT JOIN specializations AS s ON vet.id = s.vet_id AND a.species_id = s.species
 WHERE s.species_id IS NULL;
 
 -- 9
-SELECT s.name AS suggested_specialty
-FROM (SELECT a.species_id, COUNT(*) AS visits_count
-      FROM visits AS v
-      JOIN animals AS a ON v.animal_id = a.id
-      WHERE v.vet_id = (SELECT id FROM vets WHERE name = 'Maisy Smith')
-      GROUP BY a.species_id
-      ORDER BY visits_count DESC
-      LIMIT 1) AS most_visited_species
-JOIN species AS s ON most_visited_species.species_id = s.id;
+
+SELECT species.name, COUNT(*) AS visits_count
+FROM visits
+LEFT JOIN animals ON animals.id = visits.animal_id
+LEFT JOIN species ON animals.species_id = species.id
+LEFT JOIN vets ON vets.id = visits.vet_id
+WHERE vets.name = 'Maisy Smith'
+GROUP BY species.name;
